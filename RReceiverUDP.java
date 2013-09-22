@@ -200,17 +200,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 			System.out.println("Waiting on packet....");
 			try {
 				socket.receive(receivepacket);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
 				packetprocessor(receivepacket.getData());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
 				writefile(finalpacket);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
