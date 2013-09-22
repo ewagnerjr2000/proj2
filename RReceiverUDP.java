@@ -142,9 +142,10 @@ public class RReceiverUDP implements RReceiveUDPI{
 		System.arraycopy(receivepacket, 0, header_received, 0, 4);
 		
 		finalpacket = ByteBuffer.allocate(MTU-4);
-		finalpacket.flip();
+		
 		
 		finalpacket.get(receivepacket,4,finalpacket.remaining());
+		finalpacket.flip();
 		System.out.println(finalpacket.position());
 		return true;
 		
@@ -156,6 +157,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 			FileChannel outchannel = fos.getChannel();
 			System.out.println("Writing file...");
 			System.out.println("Final packet :" + finalpacket.capacity());
+			
 			outchannel.write(finalpacket);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -213,7 +215,10 @@ public class RReceiverUDP implements RReceiveUDPI{
 			String sentence = new String(receivepacket.getData(),0,receivepacket.getLength());
 			System.out.println(sentence);
 		
-		}}		
+		}
+		
+		}
+	
 	}
 	public static void main(String[] args)
 	{
