@@ -61,7 +61,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 		return windowSize;
 	}
 	
-	public boolean receiveFile() {
+	/*public boolean receiveFile() {
 		
 				try {
 					stopandwait();
@@ -70,7 +70,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 					e.printStackTrace();
 				}
 				return false;
-	}
+	}*/
 	
 	public void setFilename(String arg0) {
 		System.out.println("Setting file name...");
@@ -170,14 +170,27 @@ public class RReceiverUDP implements RReceiveUDPI{
 			return;  
 		}
 	}
-	public void stopandwait() throws IOException
+	public boolean receiveFile(){
 	{
 		
 		counter = 0;
-		socket = new UDPSocket(PORT);
+		try {
+			socket = new UDPSocket(PORT);
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		System.out.println("Stop and wait test");
 	//	socket = new UDPSocket(PORT);
-		MTU = socket.getSendBufferSize();
+		
+			try {
+				MTU = socket.getSendBufferSize();
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
 		System.out.println("MTU: "+ MTU);
 		receivebuffer = new byte[MTU];
 		while(true){
@@ -185,9 +198,24 @@ public class RReceiverUDP implements RReceiveUDPI{
 			System.out.println(socket.getLocalPort());
 			DatagramPacket receivepacket = new DatagramPacket(receivebuffer,receivebuffer.length);
 			System.out.println("Waiting on packet....");
-			socket.receive(receivepacket);
-			packetprocessor(receivepacket.getData());
-			writefile(finalpacket);
+			try {
+				socket.receive(receivepacket);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				packetprocessor(receivepacket.getData());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				writefile(finalpacket);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			incomingpacketsize = receivepacket.getLength();
 			
@@ -195,8 +223,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 			String sentence = new String(receivepacket.getData(),0,receivepacket.getLength());
 			System.out.println(sentence);
 		
-		}
-			
+		}}		
 	}
 	public static void main(String[] args)
 	{
