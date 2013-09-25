@@ -145,7 +145,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 		finalpacket = ByteBuffer.allocate(packetsize-4);
 		
 		
-		finalpacket.get(receivepacket,4,finalpacket.remaining());
+		finalpacket.put(receivepacket,4,finalpacket.remaining());
 		finalpacket.flip();
 		System.out.println(finalpacket.position());
 		return true;
