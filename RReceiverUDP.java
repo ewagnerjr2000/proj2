@@ -38,6 +38,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 	private int incomingpacketsize;
 	private ByteBuffer finalpacket; //file bytebuffer to be written to file
 	private byte[] header_received;
+	private int packetsize;
 	//private String CLIENT = "localhost";
 	private InetSocketAddress CLIENT;
 	
@@ -141,7 +142,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 		header_received = new byte[4];
 		System.arraycopy(receivepacket, 0, header_received, 0, 4);
 		
-		finalpacket = ByteBuffer.allocate(MTU-4);
+		finalpacket = ByteBuffer.allocate(packetsize-4);
 		
 		
 		finalpacket.get(receivepacket,4,finalpacket.remaining());
@@ -202,6 +203,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 			System.out.println("Waiting on packet....");
 			try {
 				socket.receive(receivepacket);
+				packetsize = receivepacket.getLength();
 				packetprocessor(receivepacket.getData());
 				writefile(finalpacket);
 			} catch (IOException e) {
