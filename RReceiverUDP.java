@@ -152,7 +152,9 @@ public class RReceiverUDP implements RReceiveUDPI{
 		
 	}
 	public void writefile(ByteBuffer finalpacket) throws IOException{
-		File file = new File (filename);
+		
+		//file = new File (filename);
+		
 		try {
 			fos = new FileOutputStream(file,true);
 			FileChannel outchannel = fos.getChannel();
@@ -175,7 +177,18 @@ public class RReceiverUDP implements RReceiveUDPI{
 	}
 	public boolean receiveFile(){
 	{
-		
+		file = new File (filename); // file object created
+		if (file.exists())  //Delete file if it exists
+		{
+			file.delete();
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	
+		}
 		counter = 0;
 		try {
 			socket = new UDPSocket(PORT);
@@ -242,4 +255,18 @@ public class RReceiverUDP implements RReceiveUDPI{
 		}
 		catch(Exception e){ e.printStackTrace(); }
 	}*/
-}}
+}
+	class acker implements Runnable
+	//Acker will be the ack sender.
+	{
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	}
+
+
