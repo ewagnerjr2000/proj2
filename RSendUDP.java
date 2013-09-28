@@ -108,6 +108,7 @@ public class RSendUDP implements RSendUDPI{
 		}
 		return false;
 	}*/
+
 	
 	public boolean sendFile() {
 		try {
@@ -124,7 +125,7 @@ public class RSendUDP implements RSendUDPI{
  		if (mode == 0)
 		{
 			System.out.println("Stop and wait is set..");
-			counter = 0;
+			counter = 1;
 			long startTime = System.currentTimeMillis();
 			totalSize = filebuffer.capacity();
 			System.out.println("Filebuffer capacity: "+ filebuffer.capacity());
@@ -137,6 +138,7 @@ public class RSendUDP implements RSendUDPI{
 				System.out.println("Little file");
 				
 			//	System.out.println("Final packet size: " + finalPacket.capacity());
+				header[0] = (byte)(counter);
 				sendpacket = new byte[header.length + filebuffer.remaining()];
 				System.arraycopy(header, 0, sendpacket, 0, 4);
 				filebuffer.get(sendpacket,4,filebuffer.remaining());
@@ -159,7 +161,7 @@ public class RSendUDP implements RSendUDPI{
 				 System.out.println("Big file");
 				 i = 0;
 				// length = array.length;
-				  
+				 counter = 1; 
 				while(i != filesize)			
 				{	
 					acked = false;
@@ -167,6 +169,8 @@ public class RSendUDP implements RSendUDPI{
 					if (MTU < totalSize)
 					{
 						sendpacket = new byte[header.length + (MTU-4)];
+						//header updated to show the count
+						header[0] = (byte)counter;
 						System.out.println(sendpacket.length);
 						System.arraycopy(header, 0, sendpacket, 0, 4);
 						filebuffer.get(sendpacket, 4,MTU-4);
@@ -191,6 +195,8 @@ public class RSendUDP implements RSendUDPI{
 					{
 					//	System.out.println("Position: "+ filebuffer.position());
 						System.out.println("Test2");
+						//header updated to show the count
+						header[0] = (byte)counter;
 						sendpacket = new byte [header.length + filebuffer.remaining()]; 
 						System.out.println("filebuffer remaining "+ filebuffer.remaining());
 						System.arraycopy(header, 0, sendpacket, 0, 4);
@@ -394,94 +400,7 @@ public class RSendUDP implements RSendUDPI{
 		
 	}
 
-	public void stopandwait() throws UnknownHostException, IOException {
-		establishLink();
-	//socket = new UDPSocket();
-		header[0] = (byte)0; // sequence number
-		header[1] = (byte)1; // length
-		header[2] = (byte)2; //last packet acked
-		header[3] = (byte)3; 
-		
-		counter = 0;
-		long startTime = System.currentTimeMillis();
-		totalSize = array.length;
-		buffer = new byte [windowSize];
-		System.out.println("WindowSize: " + windowSize);
-		finalPacket = ByteBuffer.allocate(header.length + buffer.length);
-		counter = 0;
-		acked = false;
-			if (array.length <= windowSize)
-			{
-				finalPacket = ByteBuffer.allocate(header.length + array.length);
-				System.out.println("Little file");
-				 //set the starting time.
-				finalPacket.put(header);
-				finalPacket.put(array);
-				finalPacket.flip();
-				sendpacket = new byte[finalPacket.remaining()];
-				sender = new sender(buffer);
-				Thread senderpacket = new Thread(sender);
-				senderpacket.start();
-				System.out.println(" Message " + counter + " with " + windowSize + " bytes of actual data");
-				System.out.println(" Waiting for ACK ");
-				counter++;
-				
-							
-			}
-		
-		if (array.length > windowSize)
-		{
-			 System.out.println("Big file");
-			 i = 0;
-			 length = array.length;
-			  
-			while(i != length)			
-			{	
-				acked = false;
-				System.out.println("Total Size:  " + totalSize);
-				if (windowSize < totalSize)
-				{
-					System.arraycopy(array, i, buffer, 0, windowSize);
-					totalSize = totalSize - windowSize;
-					System.out.println(" Message " + counter + " with " + windowSize + " bytes of actual data");
-				//	transmitter(buffer);
-					
-					//socket.send(new DatagramPacket(buffer, buffer.length, receiver));
-					counter++;
-					
-					
-					i = i + windowSize;
-					
-				}
-				
-				else if (windowSize > totalSize)
-				{
-				
-					System.out.println("Test2");
-					buffer1 = new byte [totalSize]; 
-					System.arraycopy(array, i, buffer1, 0, totalSize);
-					System.out.println(" Message " + counter + " with " + totalSize + " bytes of actual data");
-				//	transmitter(buffer1);
-				//	socket.send(new DatagramPacket(buffer1, buffer1.length, receiver));
-				//	timer1.schedule(new timeoutcheck(), 0, 5000);
-					sender = new sender(buffer1);
-					Thread senderpacket = new Thread(sender);
-					senderpacket.start();
-					counter++;
-					
-									
-					i = i + totalSize;
-					
-				}
-			}
-		}
-
-		long stopTime=System.currentTimeMillis();
-		System.out.printf("Seconds taken to transmit file: %f ",(float)(stopTime - startTime)/10000000);
-		System.out.println("File Transferred, exiting...");
-		System.exit(0);
-	return;
-	}
+	
 	public static void main(String[] args)
 	{
 		try {
@@ -500,7 +419,7 @@ public class RSendUDP implements RSendUDPI{
 			sender.setReceiver(new InetSocketAddress ("localhost", 12987));
 			sender.setFilename("testfile.txt");
 			
-		//	sender.sendSize();
+		
 			
 			sender.sendFile();
 			
