@@ -216,6 +216,8 @@ public class RReceiverUDP implements RReceiveUDPI{
 			System.out.println("Waiting on packet....");
 			try {
 				socket.receive(receivepacket);
+				sender = new InetSocketAddress(receivepacket.getAddress(), receivepacket.getPort());
+				socket.connect(sender);
 				packetsize = receivepacket.getLength();
 				packetprocessor(receivepacket.getData());
 				writefile(finalpacket);

@@ -245,6 +245,8 @@ public class RSendUDP implements RSendUDPI{
 		filesize = inChannel.size();
 		filebuffer = ByteBuffer.allocate((int) filesize);
 		
+		
+		//System.out.println(" SHA-1 hash: " + sha1);
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
