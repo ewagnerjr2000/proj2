@@ -448,5 +448,22 @@ class sender implements Runnable {
 	}
 	
 	}
+class ackreceiver implements Runnable {
+	private byte[] ackpacket;
+	public ackreceiver( byte[] ackpacket) {
+		this.ackpacket = ackpacket;
+	}
+	
+	public void run() {
+		
+			try {
+				socket.receive(new DatagramPacket(ackpacket,ackpacket.length));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+	
+}
 }
 

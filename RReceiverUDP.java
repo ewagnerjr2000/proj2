@@ -133,7 +133,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 		else {return false;}
 		
 	}
-	public boolean packetprocessor(byte [] receivepacket) throws IOException
+	public byte[] packetprocessor(byte [] receivepacket) throws IOException
 	{
 		//packet is disassembled here
 		//remove the header and pack the packet into a bytearray
@@ -148,7 +148,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 		finalpacket.put(receivepacket,4,finalpacket.remaining());
 		finalpacket.flip();
 		System.out.println(finalpacket.position());
-		return true;
+		return header_received;
 		
 	}
 	public void writefile(ByteBuffer finalpacket) throws IOException{
@@ -219,7 +219,9 @@ public class RReceiverUDP implements RReceiveUDPI{
 				sender = new InetSocketAddress(receivepacket.getAddress(), receivepacket.getPort());
 				socket.connect(sender);
 				packetsize = receivepacket.getLength();
-				packetprocessor(receivepacket.getData());
+				//Header returned from packetprocessor
+				header_received = packetprocessor(receivepacket.getData());
+				//Send header back to client
 				writefile(finalpacket);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
