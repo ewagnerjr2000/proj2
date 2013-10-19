@@ -264,9 +264,18 @@ public class RReceiverUDP implements RReceiveUDPI{
 	//Acker will be the ack sender.
 	{
 
-		@Override
+		
 		public void run() {
-			// TODO Auto-generated method stub
+			System.out.println("Acker running");
+			try {
+				socket.send(new DatagramPacket(header_received, header_received.length,sender));
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}
 		

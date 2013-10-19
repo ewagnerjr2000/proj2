@@ -33,6 +33,7 @@ public class RSendUDP implements RSendUDPI{
 	private String filename;
 	private UDPSocket socket;
 	private sender sender;
+	private ackreceiver ackreceiver;
 	private int MTU;
 	
 	private InetSocketAddress receiver = new InetSocketAddress("127.0.0.1", 12987);
@@ -56,7 +57,7 @@ public class RSendUDP implements RSendUDPI{
 	private boolean acked;
 	private ByteBuffer filebuffer;
 	private long filesize;
-	
+//	private byte[] ackpacket;
 	
 	public String getFilename() {
 		// TODO Auto-generated method stub
@@ -144,10 +145,22 @@ public class RSendUDP implements RSendUDPI{
 				filebuffer.get(sendpacket,4,filebuffer.remaining());
 				System.out.println(sendpacket.length);
 				sender = new sender(sendpacket);
+				ackreceiver = new ackreceiver();
 				Thread senderpacket1= new Thread(sender);
+				Thread ackreceiver1 = new Thread(ackreceiver);
+				//ackreceiver ackreceiver1 = new ackreceiver();
 				senderpacket1.start();
 				try {
 					senderpacket1.sleep(100);
+					
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				ackreceiver1.start();
+				try {
+					//ackreceiver1.sleep(100);
+					ackreceiver1.join();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -449,21 +462,34 @@ class sender implements Runnable {
 	
 	}
 class ackreceiver implements Runnable {
-	private byte[] ackpacket;
-	public ackreceiver( byte[] ackpacket) {
-		this.ackpacket = ackpacket;
-	}
+	private byte[] ackpacket = new byte[4];
 	
+	public ackreceiver() {
+		
+	}
+	public byte[] getackpacket(){
+		return ackpacket;
+		
+	}
 	public void run() {
 		
-			try {
-				socket.receive(new DatagramPacket(ackpacket,ackpacket.length));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			System.out.println("Test1");
+		//	System.out.println(ackpacket.length);
+			
+				try {
+					System.out.println(socket.getLocalPort());
+					socket = new UDPSocket(2222);
+					socket.receive(new DatagramPacket(ackpacket,ackpacket.length));
+				} catch (IOException e) {
+					System.out.println("Error in AckReceiver class");
+					e.printStackTrace();
+				}
+				System.out.println("Test from Ackreceiver");
+				
+				
 			}
+			
 	}
-	
-}
-}
+}	
+
 
