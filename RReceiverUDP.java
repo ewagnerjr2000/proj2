@@ -221,6 +221,10 @@ public class RReceiverUDP implements RReceiveUDPI{
 				packetsize = receivepacket.getLength();
 				//Header returned from packetprocessor
 				header_received = packetprocessor(receivepacket.getData());
+				
+				acker acker = new acker(header_received);
+				Thread acker1 = new Thread(acker);
+				acker1.start();
 				//Send header back to client
 				writefile(finalpacket);
 			} catch (IOException e) {
@@ -263,11 +267,16 @@ public class RReceiverUDP implements RReceiveUDPI{
 	class acker implements Runnable
 	//Acker will be the ack sender.
 	{
+		private byte[] header;
 
+		public acker (byte[] header) {
+			this.header = header;
 		
+		}
 		public void run() {
 			System.out.println("Acker running");
 			try {
+				
 				socket.send(new DatagramPacket(header_received, header_received.length,sender));
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block
