@@ -113,6 +113,7 @@ public class RSendUDP implements RSendUDPI{
 	
 	public boolean sendFile() {
 		try {
+			ackreceiver = new ackreceiver();
 			establishLink();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -145,13 +146,14 @@ public class RSendUDP implements RSendUDPI{
 				filebuffer.get(sendpacket,4,filebuffer.remaining());
 				System.out.println(sendpacket.length);
 				sender = new sender(sendpacket);
-				ackreceiver = new ackreceiver();
+				
 				Thread senderpacket1= new Thread(sender);
 				Thread ackreceiver1 = new Thread(ackreceiver);
 				//ackreceiver ackreceiver1 = new ackreceiver();
 				senderpacket1.start();
 				try {
 					senderpacket1.sleep(100);
+					senderpacket1.join();
 					
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -192,9 +194,18 @@ public class RSendUDP implements RSendUDPI{
 						
 						sender = new sender(sendpacket);
 						Thread senderpacket2 = new Thread(sender);
+						Thread ackreceiver2 = new Thread(ackreceiver);
 						senderpacket2.start();
 						try {
 							senderpacket2.sleep(100);
+							senderpacket2.join();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						ackreceiver2.start();
+						try {
+							ackreceiver2.join();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -219,9 +230,18 @@ public class RSendUDP implements RSendUDPI{
 					//	finalPacket = ByteBuffer.allocate(header.length + buffer1.length);
 						sender = new sender(sendpacket);
 						Thread senderpacket3 = new Thread(sender);
+						Thread ackreceiver3 = new Thread(ackreceiver);
 						senderpacket3.start();
 						try {
 							senderpacket3.sleep(100);
+							senderpacket3.join();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						ackreceiver3.start();
+						try {
+							ackreceiver3.join();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -482,7 +502,8 @@ class ackreceiver implements Runnable {
 						//socket = new UDPSocket();
 						socket.receive(new DatagramPacket(ackpacket,ackpacket.length,receiver));
 						String s = new String(ackpacket);
-						System.out.println("Ackpacket: "+s);
+						
+						System.out.println("Ackpacket: "+s.charAt(0));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

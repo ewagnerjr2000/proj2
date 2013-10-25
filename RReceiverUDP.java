@@ -181,6 +181,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 		if (file.exists())  //Delete file if it exists
 		{
 			file.delete();
+			System.out.println("file deleted: "+ file.exists());
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
@@ -225,9 +226,12 @@ public class RReceiverUDP implements RReceiveUDPI{
 				acker acker = new acker(header_received);
 				Thread acker1 = new Thread(acker);
 				acker1.start();
+				acker1.join();
+				socket.disconnect();
+				
 				//Send header back to client
 				writefile(finalpacket);
-			} catch (IOException e) {
+			} catch (IOException | InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -278,6 +282,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 			try {
 				
 				socket.send(new DatagramPacket(header_received, header_received.length,sender));
+				//socket.disconnect();
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
