@@ -119,6 +119,9 @@ public class RSendUDP implements RSendUDPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//sender = new sender(sendpacket);
+		//Thread senderpacket = new Thread(sender);
+		//Thread ackreceiver2 = new Thread(ackreceiver);
 		header[0] = (byte)0;
 		header[1] = (byte)1;
 		header[2] = (byte)2;
@@ -134,7 +137,9 @@ public class RSendUDP implements RSendUDPI{
 			buffer = new byte [windowSize];
 			//finalPacket = ByteBuffer.allocate(array.length);
 			System.out.println("MTU : "+ MTU);
-			
+			//Thread senderpacket1 = new Thread(sender);
+			//Thread ackreceiver1 = new Thread(ackreceiver);
+			//sender = new sender(sendpacket);
 			if (totalSize <= MTU)
 			{
 				System.out.println("Little file");
@@ -150,34 +155,32 @@ public class RSendUDP implements RSendUDPI{
 				Thread senderpacket1= new Thread(sender);
 				Thread ackreceiver1 = new Thread(ackreceiver);
 				//ackreceiver ackreceiver1 = new ackreceiver();
-				senderpacket1.start();
-				try {
-					senderpacket1.sleep(100);
-					senderpacket1.join();
+				
+				
+					try {
+						senderpacket1.start();
+						//senderpacket1.sleep(500);
+						senderpacket1.join();
+						ackreceiver1.start();
+						ackreceiver1.join();
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				ackreceiver1.start();
-				try {
-					//ackreceiver1.sleep(100);
-					ackreceiver1.join();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+					
+				
 				
 				
 			}
 			//if (array.length > windowSize)
-			if(filesize > MTU)
+			if(totalSize > MTU)
 			{
 				 System.out.println("Big file");
 				 i = 0;
 				// length = array.length;
 				 counter = 1; 
-				while(i != filesize)			
+				while(i != totalSize)			
 				{	
 					acked = false;
 					System.out.println("Total Size:  " + totalSize);
@@ -186,32 +189,29 @@ public class RSendUDP implements RSendUDPI{
 						sendpacket = new byte[header.length + (MTU-4)];
 						//header updated to show the count
 						header[0] = (byte)counter;
-						System.out.println(sendpacket.length);
+						System.out.println("sendpacket length: " + sendpacket.length);
 						System.arraycopy(header, 0, sendpacket, 0, 4);
 						filebuffer.get(sendpacket, 4,MTU-4);
-						totalSize = totalSize - MTU;
+						System.out.println("file position: " + filebuffer.position());
+						totalSize = totalSize - (MTU - 4);
 						System.out.println(" Message " + counter + " with " + MTU + " bytes of actual data");
 						
 						sender = new sender(sendpacket);
-						Thread senderpacket2 = new Thread(sender);
+						Thread senderpacket = new Thread(sender);
 						Thread ackreceiver2 = new Thread(ackreceiver);
-						senderpacket2.start();
 						try {
-							senderpacket2.sleep(100);
-							senderpacket2.join();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						ackreceiver2.start();
-						try {
+							senderpacket.start();
+							//senderpacket.sleep(500);
+							senderpacket.join();
+							ackreceiver2.start();
 							ackreceiver2.join();
-						} catch (InterruptedException e) {
+						} catch (InterruptedException e1) {
 							// TODO Auto-generated catch block
-							e.printStackTrace();
+							e1.printStackTrace();
 						}
+												
 						counter++;
-						i = i + MTU;
+						i = i + (MTU - 4);
 						
 					}
 					
@@ -219,32 +219,32 @@ public class RSendUDP implements RSendUDPI{
 					{
 					//	System.out.println("Position: "+ filebuffer.position());
 						System.out.println("Test2");
+						System.out.println("TotalSize: " + totalSize);
 						//header updated to show the count
-						header[0] = (byte)counter;
-						sendpacket = new byte [header.length + filebuffer.remaining()]; 
+						sendpacket = new byte [header.length + totalSize]; 
+						//sendpacket = new byte [header.length + filebuffer.remaining()]; 
+						
 						System.out.println("filebuffer remaining "+ filebuffer.remaining());
 						System.arraycopy(header, 0, sendpacket, 0, 4);
-						filebuffer.get(sendpacket,4,filebuffer.remaining());
+						//filebuffer.get(sendpacket,4,filebuffer.remaining());
+						filebuffer.get(sendpacket,4,totalSize);
 						//System.arraycopy(array, i, buffer1, 0, totalSize);
 						System.out.println(" Message " + counter + " with " + totalSize + " bytes of actual data");
 					//	finalPacket = ByteBuffer.allocate(header.length + buffer1.length);
 						sender = new sender(sendpacket);
 						Thread senderpacket3 = new Thread(sender);
 						Thread ackreceiver3 = new Thread(ackreceiver);
-						senderpacket3.start();
+						
 						try {
-							senderpacket3.sleep(100);
+							senderpacket3.start();
+						//senderpacket3.sleep(500);
 							senderpacket3.join();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						ackreceiver3.start();
-						try {
+							ackreceiver3.start();
 							ackreceiver3.join();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
+						
 						}
 						counter++;
 						
@@ -252,6 +252,8 @@ public class RSendUDP implements RSendUDPI{
 						i = i + totalSize;
 						
 					}
+					
+						
 				}
 						
 		}
@@ -296,54 +298,7 @@ public class RSendUDP implements RSendUDPI{
 	filebuffer.rewind();
 	}	
 	
-	/*public void setFilename(String arg0) {
-		//used to read the file in to a file stream
-		File infile = new File (arg0);
-		FileInputStream filestream = null;
-		try {
-			filestream = new FileInputStream(infile);
-		} catch (FileNotFoundException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		
-	FileChannel filechannel = filestream.getChannel();
 	
-		int offset = 0;
-	    int numRead = 0;
-	    filename = arg0;
-		System.out.println("Reading in file");
-		
-		length = infile.length();
-		array = new byte[(int) length];
-		DataInputStream dis = null;
-		try {
-			dis = new DataInputStream(new FileInputStream(infile));
-		
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} 
-		
-	    // Read in the bytes
-	   
-	    try {
-			while (offset < array.length && (numRead=dis.read(array, offset, array.length-offset)) >= 0) 
-				{
-				    offset += numRead;
-				}
-			//System.out.println(filesize.length);
-			System.out.println("Array Length: "+array.length);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-	
-	
-	
-	   
-		
-	//}
 
 	
 	public boolean setLocalPort(int arg0) {
@@ -471,10 +426,11 @@ class sender implements Runnable {
 	public void run(){
 		try{
 			//if( socket.isBound()){
+			Thread.sleep(500);
 				socket.send(new DatagramPacket(packet,packet.length,receiver));
 						
 		//	}
-		}catch(IOException e){
+		}catch(IOException | InterruptedException e){
 			System.out.println("IOException, in sender ");
 		}
 	
@@ -493,18 +449,20 @@ class ackreceiver implements Runnable {
 	}
 	public void run() {
 		
-			System.out.println("Test1");
+			System.out.println("Inside Ackreceiver");
 		//	System.out.println(ackpacket.length);
 			
 				
-					System.out.println(socket.getLocalPort());
+					System.out.println("Ack Receiver port: " + socket.getLocalPort());
 					try {
+						Thread.sleep(500);
 						//socket = new UDPSocket();
 						socket.receive(new DatagramPacket(ackpacket,ackpacket.length,receiver));
-						String s = new String(ackpacket);
+						//String s = new String(ackpacket, "UTF-8");
 						
+						String s = new String(ackpacket);
 						System.out.println("Ackpacket: "+s.charAt(0));
-					} catch (IOException e) {
+					} catch (IOException | InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}

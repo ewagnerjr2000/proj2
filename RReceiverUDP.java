@@ -227,7 +227,7 @@ public class RReceiverUDP implements RReceiveUDPI{
 				Thread acker1 = new Thread(acker);
 				acker1.start();
 				acker1.join();
-				socket.disconnect();
+		//		socket.disconnect();
 				
 				//Send header back to client
 				writefile(finalpacket);
@@ -280,13 +280,16 @@ public class RReceiverUDP implements RReceiveUDPI{
 		public void run() {
 			System.out.println("Acker running");
 			try {
-				
+				Thread.sleep(500);
 				socket.send(new DatagramPacket(header_received, header_received.length,sender));
 				//socket.disconnect();
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
