@@ -180,7 +180,7 @@ public class RSendUDP implements RSendUDPI{
 				 i = 0;
 				// length = array.length;
 				 counter = 1; 
-				while(i != totalSize)			
+				while(i != filebuffer.capacity())			
 				{	
 					acked = false;
 					System.out.println("Total Size:  " + totalSize);
@@ -252,7 +252,7 @@ public class RSendUDP implements RSendUDPI{
 						i = i + totalSize;
 						
 					}
-					
+					System.out.println("i : " +  i + " total size: " + totalSize);
 						
 				}
 						
