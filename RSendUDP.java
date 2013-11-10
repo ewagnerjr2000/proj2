@@ -217,7 +217,9 @@ public class RSendUDP implements RSendUDPI{
 					
 					else if (MTU > totalSize)
 					{
-					//	System.out.println("Position: "+ filebuffer.position());
+						//Last packet
+						header[3] = (byte) 0xFF; 
+						//System.out.println("Position: "+ filebuffer.position());
 						System.out.println("Test2");
 						System.out.println("TotalSize: " + totalSize);
 						//header updated to show the count
@@ -452,7 +454,7 @@ class ackreceiver implements Runnable {
 			System.out.println("Inside Ackreceiver");
 		//	System.out.println(ackpacket.length);
 			
-				
+					
 					System.out.println("Ack Receiver port: " + socket.getLocalPort());
 					try {
 						Thread.sleep(500);
