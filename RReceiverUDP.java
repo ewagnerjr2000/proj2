@@ -225,10 +225,21 @@ public class RReceiverUDP implements RReceiveUDPI{
 				
 				acker acker = new acker(header_received);
 				Thread acker1 = new Thread(acker);
+				if (header_received[3] == (byte) 0xFF )
+				{
+					acker1.start();
+					acker1.join();
+					System.out.println("Last packet received, closing connection");
+					//socket.close();
+					return false;
+					//break;
+				}
+				else
+				{
 				acker1.start();
 				acker1.join();
 		//		socket.disconnect();
-				
+				}
 				//Send header back to client
 				writefile(finalpacket);
 			} catch (IOException | InterruptedException e) {
@@ -282,6 +293,8 @@ public class RReceiverUDP implements RReceiveUDPI{
 			try {
 				Thread.sleep(500);
 				socket.send(new DatagramPacket(header_received, header_received.length,sender));
+					
+				
 				//socket.disconnect();
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block

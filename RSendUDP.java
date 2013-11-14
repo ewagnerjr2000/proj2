@@ -454,16 +454,19 @@ class ackreceiver implements Runnable {
 			System.out.println("Inside Ackreceiver");
 		//	System.out.println(ackpacket.length);
 			
-					
+					byte[] test;
 					System.out.println("Ack Receiver port: " + socket.getLocalPort());
 					try {
-						Thread.sleep(500);
+						Thread.sleep(10);
 						//socket = new UDPSocket();
-						socket.receive(new DatagramPacket(ackpacket,ackpacket.length,receiver));
+						byte[] ackbuffer = new byte[4];
+						DatagramPacket ackpacket = new DatagramPacket(ackbuffer,ackbuffer.length);
+						//socket.receive(new DatagramPacket(ackpacket,ackpacket.length,receiver));
+						socket.receive(ackpacket);
 						//String s = new String(ackpacket, "UTF-8");
 						
-						String s = new String(ackpacket);
-						System.out.println("Ackpacket: "+s.charAt(0));
+						String s = new String(ackpacket.getData());
+						System.out.println("Ackpacket: "+ s.charAt(0));
 					} catch (IOException | InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
