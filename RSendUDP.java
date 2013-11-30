@@ -95,22 +95,7 @@ public class RSendUDP implements RSendUDPI{
 	}
 
 
-/*	public boolean sendFile() {
-		try {
-			stopandwait();
-			//test();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		
-		}
-		return false;
-	}*/
 
-	
 	public boolean sendFile() {
 		try {
 			ackreceiver = new ackreceiver();
@@ -131,10 +116,11 @@ public class RSendUDP implements RSendUDPI{
 		{
 			System.out.println("Stop and wait is set..");
 			counter = 1;
-			long startTime = System.currentTimeMillis();
+		//	long startTime = System.currentTimeMillis();
 			totalSize = filebuffer.capacity();
 			System.out.println("Filebuffer capacity: "+ filebuffer.capacity());
 			buffer = new byte [windowSize];
+			long startTime = System.currentTimeMillis(); //saves current time for timeout
 			//finalPacket = ByteBuffer.allocate(array.length);
 			System.out.println("MTU : "+ MTU);
 			//Thread senderpacket1 = new Thread(sender);
@@ -151,7 +137,7 @@ public class RSendUDP implements RSendUDPI{
 				filebuffer.get(sendpacket,4,filebuffer.remaining());
 				System.out.println(sendpacket.length);
 				sender = new sender(sendpacket);
-				
+				System.out.println("Sending packet number: " + counter);
 				Thread senderpacket1= new Thread(sender);
 				Thread ackreceiver1 = new Thread(ackreceiver);
 				//ackreceiver ackreceiver1 = new ackreceiver();
@@ -160,6 +146,7 @@ public class RSendUDP implements RSendUDPI{
 					try {
 						senderpacket1.start();
 						//senderpacket1.sleep(500);
+						
 						senderpacket1.join();
 						ackreceiver1.start();
 						ackreceiver1.join();
@@ -195,7 +182,7 @@ public class RSendUDP implements RSendUDPI{
 						System.out.println("file position: " + filebuffer.position());
 						totalSize = totalSize - (MTU - 4);
 						System.out.println(" Message " + counter + " with " + MTU + " bytes of actual data");
-						
+						System.out.println("Sending packet number: " + counter);
 						sender = new sender(sendpacket);
 						Thread senderpacket = new Thread(sender);
 						Thread ackreceiver2 = new Thread(ackreceiver);
@@ -234,6 +221,7 @@ public class RSendUDP implements RSendUDPI{
 						System.out.println(" Message " + counter + " with " + totalSize + " bytes of actual data");
 					//	finalPacket = ByteBuffer.allocate(header.length + buffer1.length);
 						sender = new sender(sendpacket);
+						System.out.println("Sending packet number: " + counter);
 						Thread senderpacket3 = new Thread(sender);
 						Thread ackreceiver3 = new Thread(ackreceiver);
 						
@@ -263,8 +251,11 @@ public class RSendUDP implements RSendUDPI{
 		{
 			System.out.println("No Sliding window enabled.");
 			return false;
-		}}
-		return false;
+		}
+		long finish_time = System.currentTimeMillis();
+		System.out.println("Total time to send: " + (finish_time - startTime));
+		}
+		return true;
 	}
 	public void setFilename(String arg0){
 		//Reads the file into a Bytebuffer.
@@ -466,7 +457,8 @@ class ackreceiver implements Runnable {
 						//String s = new String(ackpacket, "UTF-8");
 						
 						String s = new String(ackpacket.getData());
-						System.out.println("Ackpacket: "+ s.charAt(0));
+						System.out.println("Are we acking the current packet: " + (int)s.charAt(0)+ ", " + counter);
+						System.out.println("Ackpacket: "+ (int)s.charAt(0));
 					} catch (IOException | InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
