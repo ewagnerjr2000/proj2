@@ -29,4 +29,6 @@ packet.delay.maximum = 100
 
 #== packet maximum transmission size =============
 #
-# 
+# -1 unlimited (Integer.MAX_VALUE)
+
+packet.mtu = 256
