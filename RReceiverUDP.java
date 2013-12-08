@@ -222,12 +222,13 @@ public class RReceiverUDP implements RReceiveUDPI {
 					acker acker = new acker(header_received);
 					Thread acker1 = new Thread(acker);
 					if (header_received[3] == (byte) 0xFF) {
+						
 						acker1.start();
 						acker1.join();
-						System.out.println("Last packet received, closing connection");
+						//System.out.println("Last packet received, closing connection");
 						// socket.close();
 						//return true;
-						// break;
+						
 					} else {
 						acker1.start();
 						acker1.join();
