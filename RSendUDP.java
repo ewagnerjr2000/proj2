@@ -55,9 +55,11 @@ public class RSendUDP implements RSendUDPI{
 	private byte[] sendpacket; // final packet 
 	private ByteBuffer finalPacket; 
 	private boolean acked;
+	//private Vector<Integer> packets;
 	private ByteBuffer filebuffer;
 	private long filesize;
 //	private byte[] ackpacket;
+	Vector<Integer> packets = new Vector<Integer>(5,1);
 	
 	public String getFilename() {
 		// TODO Auto-generated method stub
@@ -104,6 +106,7 @@ public class RSendUDP implements RSendUDPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		//sender = new sender(sendpacket);
 		//Thread senderpacket = new Thread(sender);
 		//Thread ackreceiver2 = new Thread(ackreceiver);
@@ -111,6 +114,7 @@ public class RSendUDP implements RSendUDPI{
 		header[1] = (byte)1;
 		header[2] = (byte)2;
 		header[3] = (byte)3;
+		
 		//finalPacket = ByteBuffer.allocate(header.length + buffer.length);
  		if (mode == 0)
 		{
@@ -252,8 +256,12 @@ public class RSendUDP implements RSendUDPI{
 			System.out.println("No Sliding window enabled.");
 			return false;
 		}
+		System.out.println("Vector size:" + packets.capacity());
+		System.out.println(packets.elements());
+		
 		long finish_time = System.currentTimeMillis();
 		System.out.println("Total time to send: " + (finish_time - startTime));
+		
 		}
 		return true;
 	}
@@ -459,6 +467,7 @@ class ackreceiver implements Runnable {
 						String s = new String(ackpacket.getData());
 						System.out.println("Are we acking the current packet: " + (int)s.charAt(0)+ ", " + counter);
 						System.out.println("Ackpacket: "+ (int)s.charAt(0));
+						packets.addElement(new Integer((int)s.charAt(0)));
 					} catch (IOException | InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
