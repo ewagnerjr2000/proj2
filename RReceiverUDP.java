@@ -212,22 +212,17 @@ public class RReceiverUDP implements RReceiveUDPI {
 				System.out.println("Waiting on packet....");
 				try {
 					socket.receive(receivepacket);
-					sender = new InetSocketAddress(receivepacket.getAddress(),
-							receivepacket.getPort());
+					sender = new InetSocketAddress(receivepacket.getAddress(),receivepacket.getPort());
 					socket.connect(sender);
 					packetsize = receivepacket.getLength();
 					// Header returned from packetprocessor
 					header_received = packetprocessor(receivepacket.getData());
-					
-					
+										
 					acker acker = new acker(header_received);
 					Thread acker1 = new Thread(acker);
-						acker1.start();
-						acker1.join();
-						//System.out.println("Last packet received, closing connection");
-						// socket.close();
-						//return true;
-
+					acker1.start();
+					acker1.join();
+					
 					// Send header back to client
 					writefile(finalpacket);
 				} catch (IOException | InterruptedException e) {
