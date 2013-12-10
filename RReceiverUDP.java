@@ -225,11 +225,7 @@ public class RReceiverUDP implements RReceiveUDPI {
 					
 						acker1.start();
 						acker1.join();
-						//System.out.println("Last packet received, closing connection");
-						// socket.close();
-						//return true;
-						// break;
-	
+							
 					// Send header back to client
 					writefile(finalpacket);
 				} catch (IOException | InterruptedException e) {
