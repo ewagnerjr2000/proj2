@@ -256,7 +256,7 @@ public class RSendUDP implements RSendUDPI{
 			return false;
 		}
 		
-		
+		System.out.println(packetmap);
 		long finish_time = System.currentTimeMillis();
 		System.out.println("Total time to send: " + (finish_time - startTime));
 		
