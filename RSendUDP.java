@@ -59,7 +59,7 @@ public class RSendUDP implements RSendUDPI{
 	private ByteBuffer filebuffer;
 	private long filesize;
 //	private byte[] ackpacket;
-	Vector<Integer> packets = new Vector<Integer>(5,1);
+	Map<Integer,Integer> packetmap = new HashMap<Integer,Integer> ();
 	
 	public String getFilename() {
 		// TODO Auto-generated method stub
@@ -231,7 +231,6 @@ public class RSendUDP implements RSendUDPI{
 						
 						try {
 							senderpacket3.start();
-						//senderpacket3.sleep(500);
 							senderpacket3.join();
 							ackreceiver3.start();
 							ackreceiver3.join();
@@ -256,8 +255,7 @@ public class RSendUDP implements RSendUDPI{
 			System.out.println("No Sliding window enabled.");
 			return false;
 		}
-		System.out.println("Vector size:" + packets.capacity());
-		System.out.println(packets.elements());
+		
 		
 		long finish_time = System.currentTimeMillis();
 		System.out.println("Total time to send: " + (finish_time - startTime));
@@ -467,7 +465,7 @@ class ackreceiver implements Runnable {
 						String s = new String(ackpacket.getData());
 						System.out.println("Are we acking the current packet: " + (int)s.charAt(0)+ ", " + counter);
 						System.out.println("Ackpacket: "+ (int)s.charAt(0));
-						packets.addElement(new Integer((int)s.charAt(0)));
+						packetmap.put((int)s.charAt(0), (int)s.charAt(1));
 					} catch (IOException | InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

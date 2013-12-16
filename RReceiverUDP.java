@@ -136,7 +136,8 @@ public class RReceiverUDP implements RReceiveUDPI {
 		// copy the header off from packet to header_received
 		header_received = new byte[4];
 		System.arraycopy(receivepacket, 0, header_received, 0, 4);
-
+		//change acknowledged here to 1
+		header_received[1] = (byte)0x01;
 		finalpacket = ByteBuffer.allocate(packetsize - 4);
 
 		finalpacket.put(receivepacket, 4, finalpacket.remaining());
