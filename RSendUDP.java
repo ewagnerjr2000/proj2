@@ -136,6 +136,7 @@ public class RSendUDP implements RSendUDPI{
 				
 			//	System.out.println("Final packet size: " + finalPacket.capacity());
 				header[0] = (byte)(counter);
+				header[3] = (byte) 0xFF; 
 				sendpacket = new byte[header.length + filebuffer.remaining()];
 				System.arraycopy(header, 0, sendpacket, 0, 4);
 				filebuffer.get(sendpacket,4,filebuffer.remaining());
@@ -250,17 +251,19 @@ public class RSendUDP implements RSendUDPI{
 				}
 						
 		}
-		else
+		
+		System.out.println(packetmap);
+		long finish_time = System.currentTimeMillis();
+		double totaltime = ((double)finish_time - (double)startTime)/1000;
+		System.out.format("Total time in seconds to send: " +"%.2f%n\n",totaltime);
+		
+		}
+ 		else
 		{
 			System.out.println("No Sliding window enabled.");
 			return false;
 		}
 		
-		System.out.println(packetmap);
-		long finish_time = System.currentTimeMillis();
-		System.out.println("Total time to send: " + (finish_time - startTime));
-		
-		}
 		return true;
 	}
 	public void setFilename(String arg0){
