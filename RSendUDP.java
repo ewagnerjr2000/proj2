@@ -33,6 +33,7 @@ public class RSendUDP implements RSendUDPI{
 	private String filename;
 	private UDPSocket socket;
 	private sender sender;
+	private timer timer;
 	private ackreceiver ackreceiver;
 	private int MTU;
 	
@@ -114,7 +115,7 @@ public class RSendUDP implements RSendUDPI{
 		header[1] = (byte)1;
 		header[2] = (byte)2;
 		header[3] = (byte)3;
-		
+		Thread timer1 = new Thread(timer);
 		//finalPacket = ByteBuffer.allocate(header.length + buffer.length);
  		if (mode == 0)
 		{
@@ -151,10 +152,11 @@ public class RSendUDP implements RSendUDPI{
 					try {
 						senderpacket1.start();
 						//senderpacket1.sleep(500);
-						
+						timer1.start();
 						senderpacket1.join();
 						ackreceiver1.start();
 						ackreceiver1.join();
+						timer1.join();
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -428,7 +430,7 @@ class sender implements Runnable {
 	public void run(){
 		try{
 			//if( socket.isBound()){
-			Thread.sleep(500);
+			Thread.sleep(0);
 				socket.send(new DatagramPacket(packet,packet.length,receiver));
 						
 		//	}
@@ -481,6 +483,23 @@ class ackreceiver implements Runnable {
 			}
 			
 	}
+
+class timer implements Runnable {
+
+	public timer() {}
+	
+	public void run() {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Timer thread has awoken");
+		
+	}
+	
+}
 }	
 
 
