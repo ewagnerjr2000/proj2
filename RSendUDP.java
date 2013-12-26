@@ -422,7 +422,7 @@ public class RSendUDP implements RSendUDPI{
 	}
 
 
-class sender implements Runnable {
+class sender extends TimerTask implements Runnable {
 	private byte[] packet;
 	public sender( byte[] packet){
 		this.packet = packet;
