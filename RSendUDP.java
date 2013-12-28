@@ -27,6 +27,8 @@ import java.util.PropertyPermission;
 import java.nio.*;
 import java.nio.channels.FileChannel;
 import java.net.DatagramSocket;
+
+//import timer_test.MyTask;
 public class RSendUDP implements RSendUDPI{
 	static String SERVER = "localhost";
 	private int PORT = 12987;
@@ -46,6 +48,7 @@ public class RSendUDP implements RSendUDPI{
 	private int counter;
 	private int totalSize;
 	private int windowSize = 256;
+
 	
 	private int mode = 0;
 	private int i;
@@ -107,7 +110,10 @@ public class RSendUDP implements RSendUDPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		Timer timer = new Timer("Printer");
+		acked = false;
+        //2- Taking an instance of class contains your repeated method.
+        MyTask t = new MyTask();
 		//sender = new sender(sendpacket);
 		//Thread senderpacket = new Thread(sender);
 		//Thread ackreceiver2 = new Thread(ackreceiver);
@@ -115,7 +121,7 @@ public class RSendUDP implements RSendUDPI{
 		header[1] = (byte)1;
 		header[2] = (byte)2;
 		header[3] = (byte)3;
-		Thread timer1 = new Thread(timer);
+		//Thread timer1 = new Thread(timer);
 		//finalPacket = ByteBuffer.allocate(header.length + buffer.length);
  		if (mode == 0)
 		{
@@ -152,11 +158,12 @@ public class RSendUDP implements RSendUDPI{
 					try {
 						senderpacket1.start();
 						//senderpacket1.sleep(500);
-						timer1.start();
+						//timer1.start();
 						senderpacket1.join();
+						timer.schedule(t, 0, 2000);
 						ackreceiver1.start();
 						ackreceiver1.join();
-						timer1.join();
+					//	timer1.join();
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -466,7 +473,7 @@ class ackreceiver implements Runnable {
 						//socket.receive(new DatagramPacket(ackpacket,ackpacket.length,receiver));
 						socket.receive(ackpacket);
 						//String s = new String(ackpacket, "UTF-8");
-						
+						acked = true;
 						String s = new String(ackpacket.getData());
 						System.out.println("Are we acking the current packet: " + (int)s.charAt(0)+ ", " + counter);
 						System.out.println("Ackpacket: "+ (int)s.charAt(0));
@@ -491,6 +498,7 @@ class timer implements Runnable {
 	public void run() {
 		try {
 			Thread.sleep(5000);
+			System.out.println("Timer done sleeping");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -500,6 +508,27 @@ class timer implements Runnable {
 	}
 	
 }
-}	
+}
+
+
+class MyTask extends TimerTask {
+    //times member represent calling times.
+    private int times = 0;
+ 
+ 
+    public void run() {
+        times++;
+        if (times <= 5) {
+            System.out.println("I'm alive...");
+           //socket.send(new DatagramPacket(packet,packet.length,receiver));
+           
+        } else {
+            System.out.println("Timer stops now...");
+ 
+            //Stop Timer.
+            this.cancel();
+        }
+    }
+}
 
 
