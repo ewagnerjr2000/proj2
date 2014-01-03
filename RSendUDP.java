@@ -35,7 +35,8 @@ public class RSendUDP implements RSendUDPI{
 	private String filename;
 	private UDPSocket socket;
 	private sender sender;
-	private timer timer;
+	private Timer timer;
+	private MyTask t;
 	private ackreceiver ackreceiver;
 	private int MTU;
 	
@@ -110,10 +111,10 @@ public class RSendUDP implements RSendUDPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Timer timer = new Timer("Printer");
+		timer = new Timer("Printer");
 		acked = false;
         //2- Taking an instance of class contains your repeated method.
-        MyTask t = new MyTask();
+        t = new MyTask(array);
 		//sender = new sender(sendpacket);
 		//Thread senderpacket = new Thread(sender);
 		//Thread ackreceiver2 = new Thread(ackreceiver);
@@ -140,7 +141,7 @@ public class RSendUDP implements RSendUDPI{
 			if (totalSize <= MTU)
 			{
 				System.out.println("Little file");
-				
+				acked = false;
 			//	System.out.println("Final packet size: " + finalPacket.capacity());
 				header[0] = (byte)(counter);
 				header[3] = (byte) 0xFF; 
@@ -160,8 +161,9 @@ public class RSendUDP implements RSendUDPI{
 						//senderpacket1.sleep(500);
 						//timer1.start();
 						senderpacket1.join();
-						timer.schedule(t, 0, 2000);
+						
 						ackreceiver1.start();
+						timer.schedule(new MyTask(sendpacket), 2000, 2000);
 						ackreceiver1.join();
 					//	timer1.join();
 					} catch (InterruptedException e1) {
@@ -203,8 +205,10 @@ public class RSendUDP implements RSendUDPI{
 						try {
 							senderpacket.start();
 							//senderpacket.sleep(500);
+							
 							senderpacket.join();
 							ackreceiver2.start();
+							timer.schedule(new MyTask(sendpacket), 2000, 2000);
 							ackreceiver2.join();
 						} catch (InterruptedException e1) {
 							// TODO Auto-generated catch block
@@ -241,8 +245,10 @@ public class RSendUDP implements RSendUDPI{
 						
 						try {
 							senderpacket3.start();
+							
 							senderpacket3.join();
 							ackreceiver3.start();
+							timer.schedule(new MyTask(sendpacket), 2000, 2000);
 							ackreceiver3.join();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
@@ -429,7 +435,7 @@ public class RSendUDP implements RSendUDPI{
 	}
 
 
-class sender extends TimerTask implements Runnable {
+class sender implements Runnable {
 	private byte[] packet;
 	public sender( byte[] packet){
 		this.packet = packet;
@@ -508,19 +514,35 @@ class timer implements Runnable {
 	}
 	
 }
-}
+
 
 
 class MyTask extends TimerTask {
     //times member represent calling times.
     private int times = 0;
- 
+    private byte[] packet;
+	public MyTask(byte[] sendpacket) {
+		this.packet = sendpacket;
+	}
+
+	
  
     public void run() {
-        times++;
-        if (times <= 5) {
+        
+      //  if (acked == false)
+        if (acked == false) {
             System.out.println("I'm alive...");
-           //socket.send(new DatagramPacket(packet,packet.length,receiver));
+           
+			try {
+				socket.send(new DatagramPacket(packet,packet.length,receiver));
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
            
         } else {
             System.out.println("Timer stops now...");
@@ -529,6 +551,7 @@ class MyTask extends TimerTask {
             this.cancel();
         }
     }
+}
 }
 
 
