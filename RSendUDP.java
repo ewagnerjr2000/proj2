@@ -35,8 +35,8 @@ public class RSendUDP implements RSendUDPI{
 	private String filename;
 	private UDPSocket socket;
 	private sender sender;
-	private Timer timer;
-	private MyTask t;
+	private timer timer;
+//	private MyTask t;
 	private ackreceiver ackreceiver;
 	private int MTU;
 	
@@ -111,10 +111,10 @@ public class RSendUDP implements RSendUDPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		timer = new Timer("Printer");
+		//timer = new Timer("Printer");
 		acked = false;
         //2- Taking an instance of class contains your repeated method.
-        t = new MyTask(array);
+    //    t = new MyTask(array);
 		//sender = new sender(sendpacket);
 		//Thread senderpacket = new Thread(sender);
 		//Thread ackreceiver2 = new Thread(ackreceiver);
@@ -125,7 +125,8 @@ public class RSendUDP implements RSendUDPI{
 		//Thread timer1 = new Thread(timer);
 		//finalPacket = ByteBuffer.allocate(header.length + buffer.length);
  		if (mode == 0)
-		{
+		{	
+ 			
 			System.out.println("Stop and wait is set..");
 			counter = 1;
 		//	long startTime = System.currentTimeMillis();
@@ -150,25 +151,27 @@ public class RSendUDP implements RSendUDPI{
 				filebuffer.get(sendpacket,4,filebuffer.remaining());
 				System.out.println(sendpacket.length);
 				sender = new sender(sendpacket);
+				timer = new timer(sendpacket);
 				System.out.println("Sending packet number: " + counter);
 				Thread senderpacket1= new Thread(sender);
 				Thread ackreceiver1 = new Thread(ackreceiver);
+				Thread timer1 = new Thread(timer);
 				//ackreceiver ackreceiver1 = new ackreceiver();
 				
 				
+					
+					
 					try {
 						senderpacket1.start();
-						//senderpacket1.sleep(500);
-						//timer1.start();
 						senderpacket1.join();
-						
+						timer1.start();
 						ackreceiver1.start();
-						timer.schedule(new MyTask(sendpacket), 2000, 2000);
+						
 						ackreceiver1.join();
-					//	timer1.join();
-					} catch (InterruptedException e1) {
+						timer1.join();
+					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						e.printStackTrace();
 					}
 					
 					
@@ -200,21 +203,27 @@ public class RSendUDP implements RSendUDPI{
 						System.out.println(" Message " + counter + " with " + MTU + " bytes of actual data");
 						System.out.println("Sending packet number: " + counter);
 						sender = new sender(sendpacket);
-						Thread senderpacket = new Thread(sender);
+						Thread senderpacket2 = new Thread(sender);
 						Thread ackreceiver2 = new Thread(ackreceiver);
+						Thread timer2 = new Thread(timer);
 						try {
-							senderpacket.start();
+							System.out.println("Acked: "+ acked);
+							senderpacket2.start();
 							//senderpacket.sleep(500);
-							
-							senderpacket.join();
+								
+							senderpacket2.join();
+							timer2.start();
 							ackreceiver2.start();
-							timer.schedule(new MyTask(sendpacket), 2000, 2000);
+							
 							ackreceiver2.join();
+							timer2.join();
+							//timer.schedule(new MyTask(sendpacket),2000,2000);
+							System.out.println("Acked: "+ acked);
 						} catch (InterruptedException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-												
+											
 						counter++;
 						i = i + (MTU - 4);
 						
@@ -242,14 +251,18 @@ public class RSendUDP implements RSendUDPI{
 						System.out.println("Sending packet number: " + counter);
 						Thread senderpacket3 = new Thread(sender);
 						Thread ackreceiver3 = new Thread(ackreceiver);
+						Thread timer3 = new Thread(timer);
 						
 						try {
 							senderpacket3.start();
 							
 							senderpacket3.join();
+							timer3.start();
 							ackreceiver3.start();
-							timer.schedule(new MyTask(sendpacket), 2000, 2000);
+					//		timer.schedule(new MyTask(sendpacket), 0, 2000);
+							
 							ackreceiver3.join();
+							timer3.join();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -498,18 +511,35 @@ class ackreceiver implements Runnable {
 	}
 
 class timer implements Runnable {
-
-	public timer() {}
+	private byte[] packet;
+	public timer( byte[] packet){
+		this.packet = packet;
+	}
+	
 	
 	public void run() {
-		try {
-			Thread.sleep(5000);
+		
+			System.out.println("Test ");
+			try {
+				Thread.sleep(2000);
+				if (acked == false)
+				{
+					
+					socket.send(new DatagramPacket(packet,packet.length,receiver));
+				}
+				
+				else
+				{
+					//Thread.currentThread().join();
+					System.out.println("Value has been acked");
+				}
+			} catch (InterruptedException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
 			System.out.println("Timer done sleeping");
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Timer thread has awoken");
+		
 		
 	}
 	
@@ -517,7 +547,7 @@ class timer implements Runnable {
 
 
 
-class MyTask extends TimerTask {
+/*class MyTask extends TimerTask {
     //times member represent calling times.
     private int times = 0;
     private byte[] packet;
@@ -550,8 +580,10 @@ class MyTask extends TimerTask {
             //Stop Timer.
             this.cancel();
         }
-    }
+    }*/
+
+	
 }
-}
+
 
 
