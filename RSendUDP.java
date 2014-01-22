@@ -139,7 +139,50 @@ public class RSendUDP implements RSendUDPI{
 			//Thread senderpacket1 = new Thread(sender);
 			//Thread ackreceiver1 = new Thread(ackreceiver);
 			//sender = new sender(sendpacket);
-			if (totalSize <= MTU)
+			
+			
+			while (i != totalSize)
+			{
+				header[0] = (byte)(counter);
+			//	sendpacket = new byte[header.length + filebuffer.remaining()];
+				//sendpacket = new byte[header.length + MTU-4];
+				//System.arraycopy(header, 0, sendpacket, 0, 4);
+				System.out.println("Filebuffer remaining: "+ filebuffer.remaining());
+				if (filebuffer.remaining() < (MTU - 4)){ //filebuffer is less than MTU-4
+					sendpacket = new byte[header.length + filebuffer.remaining()];
+					System.arraycopy(header, 0, sendpacket, 0, 4);
+					i = i + (filebuffer.remaining());
+					filebuffer.get(sendpacket,4,filebuffer.remaining());
+					
+				}
+				else{
+					sendpacket = new byte[header.length + MTU-4]; //filebuffer is greater than MTU-4
+					System.arraycopy(header, 0, sendpacket, 0, 4);
+					filebuffer.get(sendpacket,4,MTU-4);
+					i = i + (MTU - 4);
+				}
+				
+				
+				System.out.println(sendpacket.length);
+				sender = new sender(sendpacket);
+				System.out.println("Sending packet number: " + counter);
+				Thread senderpacket1= new Thread(sender);
+				Thread ackreceiver1 = new Thread(ackreceiver);
+				Thread timer1 = new Thread(timer);
+					try {
+						senderpacket1.start();
+						senderpacket1.join();
+						ackreceiver1.start();
+						ackreceiver1.join();
+						
+					}catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					counter++;
+			}
+			/*if (totalSize <= MTU)
 			{
 				System.out.println("Little file");
 				acked = false;
@@ -279,7 +322,7 @@ public class RSendUDP implements RSendUDPI{
 				}
 						
 		}
-		
+		*/
 		System.out.println(packetmap);
 		long finish_time = System.currentTimeMillis();
 		double totaltime = ((double)finish_time - (double)startTime)/1000;
@@ -485,7 +528,7 @@ class ackreceiver implements Runnable {
 					byte[] test;
 					System.out.println("Ack Receiver port: " + socket.getLocalPort());
 					try {
-						Thread.sleep(10);
+						Thread.sleep(0);
 						//socket = new UDPSocket();
 						byte[] ackbuffer = new byte[4];
 						DatagramPacket ackpacket = new DatagramPacket(ackbuffer,ackbuffer.length);
