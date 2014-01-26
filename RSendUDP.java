@@ -35,7 +35,7 @@ public class RSendUDP implements RSendUDPI{
 	private String filename;
 	private UDPSocket socket;
 	private sender sender;
-	private timer timer;
+	private Timer timer = new Timer();;
 //	private MyTask t;
 	private ackreceiver ackreceiver;
 	private int MTU;
@@ -65,6 +65,7 @@ public class RSendUDP implements RSendUDPI{
 	private long filesize;
 //	private byte[] ackpacket;
 	Map<Integer,Integer> packetmap = new HashMap<Integer,Integer> ();
+	
 	
 	public String getFilename() {
 		// TODO Auto-generated method stub
@@ -168,10 +169,11 @@ public class RSendUDP implements RSendUDPI{
 				System.out.println("Sending packet number: " + counter);
 				Thread senderpacket1= new Thread(sender);
 				Thread ackreceiver1 = new Thread(ackreceiver);
-				Thread timer1 = new Thread(timer);
+				//Thread timer1 = new Thread(timer);
 					try {
 						senderpacket1.start();
 						senderpacket1.join();
+						timer.schedule(new MyTask(sendpacket),2000,2000);
 						ackreceiver1.start();
 						ackreceiver1.join();
 						
@@ -560,6 +562,12 @@ class timer implements Runnable {
 	}
 	
 	
+	public void schedule(MyTask myTask, int i, int j) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 	public void run() {
 		
 			System.out.println("Test ");
@@ -590,7 +598,7 @@ class timer implements Runnable {
 
 
 
-/*class MyTask extends TimerTask {
+class MyTask extends TimerTask {
     //times member represent calling times.
     private int times = 0;
     private byte[] packet;
@@ -623,9 +631,10 @@ class timer implements Runnable {
             //Stop Timer.
             this.cancel();
         }
-    }*/
+    }
 
 	
+}
 }
 
 
