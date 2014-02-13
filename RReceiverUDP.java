@@ -12,6 +12,9 @@ import edu.utulsa.unet.*;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 
@@ -42,7 +45,7 @@ public class RReceiverUDP implements RReceiveUDPI {
 	private int packetsize;
 	// private String CLIENT = "localhost";
 	private InetSocketAddress CLIENT;
-
+	private ArrayList<Integer> packetreceived;
 	public String getFilename() {
 
 		return filename;
@@ -137,7 +140,7 @@ public class RReceiverUDP implements RReceiveUDPI {
 		header_received = new byte[4];
 		System.arraycopy(receivepacket, 0, header_received, 0, 4);
 		//change acknowledged here to 1
-		header_received[1] = (byte)0x01;
+	//	header_received[1] = (byte)0x01;
 		finalpacket = ByteBuffer.allocate(packetsize - 4);
 
 		finalpacket.put(receivepacket, 4, finalpacket.remaining());
@@ -172,6 +175,7 @@ public class RReceiverUDP implements RReceiveUDPI {
 
 	public boolean receiveFile() {
 		{
+			packetreceived = new ArrayList<Integer>();
 			file = new File(filename); // file object created
 			if (file.exists()) // Delete file if it exists
 			{
@@ -218,16 +222,23 @@ public class RReceiverUDP implements RReceiveUDPI {
 					packetsize = receivepacket.getLength();
 					// Header returned from packetprocessor
 					header_received = packetprocessor(receivepacket.getData());
-										
+					//System.out.println("header: " + (int)header_received[0]);
+					int headerval = (int)header_received[0];
+					packetreceived.add(headerval);		
+					System.out.println("capacity:" + packetreceived.size());
 					acker acker = new acker(header_received);
 					Thread acker1 = new Thread(acker);
 
 					acker1.start();
 					acker1.join();
 					
-
+					
 					// Send header back to client
 					writefile(finalpacket);
+				
+						
+				
+					
 				} catch (IOException | InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -255,6 +266,7 @@ public class RReceiverUDP implements RReceiveUDPI {
 		receiver.setModeParameter(80);
 		receiver.setMode(0);
 		receiver.receiveFile();
+
 		/*
 		 * try { byte [] buffer = new byte[11]; UDPSocket socket = new
 		 * UDPSocket(PORT); DatagramPacket packet = new
@@ -262,7 +274,7 @@ public class RReceiverUDP implements RReceiveUDPI {
 		 * InetAddress client = packet.getAddress();
 		 * System.out.println(" Received'"+new String(buffer)+"' from "
 		 * +packet.getAddress().getHostAddress()); } catch(Exception e){
-		 * e.printStackTrace(); } }
+*		 * e.printStackTrace(); } }
 		 */
 	}
 
