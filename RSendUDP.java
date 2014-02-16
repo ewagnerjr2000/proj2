@@ -148,9 +148,11 @@ public class RSendUDP implements RSendUDPI{
 				System.out.println("Filebuffer remaining: "+ filebuffer.remaining());
 				if (filebuffer.remaining() < (MTU - 4)){ //filebuffer is less than MTU-4
 					sendpacket = new byte[header.length + filebuffer.remaining()];
+					header[3] = (byte) 0xFF; 
 					System.arraycopy(header, 0, sendpacket, 0, 4);
 					i = i + (filebuffer.remaining());
 					filebuffer.get(sendpacket,4,filebuffer.remaining());
+					
 					
 				}
 				else{
