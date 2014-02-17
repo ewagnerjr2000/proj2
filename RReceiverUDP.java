@@ -223,8 +223,10 @@ public class RReceiverUDP implements RReceiveUDPI {
 					// Header returned from packetprocessor
 					header_received = packetprocessor(receivepacket.getData());
 					//System.out.println("header: " + (int)header_received[0]);
-					int headerval = (int)header_received[0];
-					packetreceived.add(headerval);		
+				
+					//int headerval = (int)header_received[0];
+					//packetreceived.add(headerval);		//creates a hashmap of packets received
+					
 					System.out.println("capacity:" + packetreceived.size());
 					acker acker = new acker(header_received);
 					Thread acker1 = new Thread(acker);
@@ -232,9 +234,20 @@ public class RReceiverUDP implements RReceiveUDPI {
 					acker1.start();
 					acker1.join();
 					
-					
+					int headerval = (int)header_received[0];
+					if (packetreceived.contains(headerval))
+					{
+						System.out.println("I have the packet");
+						
+					}
+					else
+					{
+						packetreceived.add(headerval);
+						writefile(finalpacket);
+					}
 					// Send header back to client
-					writefile(finalpacket);
+					
+					//writefile(finalpacket);
 				
 						
 				
@@ -291,7 +304,7 @@ public class RReceiverUDP implements RReceiveUDPI {
 		public void run() {
 			System.out.println("Acker running");
 			try {
-				Thread.sleep(500);
+				Thread.sleep(0);
 				socket.send(new DatagramPacket(header_received,
 						header_received.length, sender));
 
